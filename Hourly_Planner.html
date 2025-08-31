@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hourly Planner</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f4f4f4;
+    }
+    .import-button {
+        background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+    }
+    /* Dark Mode Styles */
+    body.dark-mode {
+        background-color: #333;
+        color: #fff;
+    }
+    .planner.dark-mode {
+        background-color: #444;
+        border-color: #666;
+    }
+    .dark-mode .slider {
+        background-color: #333;
+    }
+    .header.dark-mode {
+        color: #fff;
+    }
+    .time-slot.dark-mode {
+        background-color: #555;
+        border-color: #777;
+    }
+    .input.dark-mode {
+        background-color: #666;
+        color: #fff;
+        border-color: #66d9ef;
+    }
+    .input.dark-mode:focus {
+        border-color: #66d9ef;
+    }
+    .save-message.dark-mode {
+        color: #fff;
+    }
+    .dark-mode {
+        background-color: #333;
+        color: #fff;
+    }
+    .dark-mode a {
+        color: #66d9ef;
+    }
+    .dark-mode a:hover {
+        color: #fff;
+    }
+    .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
+        color: #66d9ef;
+    }
+    .dark-mode p, .dark-mode span, .dark-mode div, .dark-mode li {
+        color: #fff;
+    }
+    .dark-mode input, .dark-mode textarea, .dark-mode select {
+        background-color: #444;
+        color: #fff;
+        border: 1px solid #66d9ef;
+    }
+    .dark-mode input:focus + .slider {
+        box-shadow: none; /* Remove the focus shadow in dark mode */
+    }
+    .dark-mode input:focus, .dark-mode textarea:focus, .dark-mode select:focus {
+        border: 1px solid #66d9ef;
+        box-shadow: 0 0 5px #66d9ef;
+    }
+    .dark-mode button, .dark-mode .btn {
+        background-color: #66d9ef;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .voice-input-button {
+        width: 32px;
+        height: 39px;
+        padding: 2px;
+    }
+    /* Ensure the styles are consistent in dark mode */
+    .dark-mode .voice-input-button {
+        width: 32px;
+        height: 39px;
+        padding: 2px;
+    }
+    .dark-mode button:hover, .dark-mode .btn:hover {
+        background-color: #fff;
+        color: #66d9ef;
+    }
+    .dark-mode .input,
+    .dark-mode .input:focus,
+    .dark-mode .input:active {
+        color: white;
+        background-color: #444; /* Or any dark color that fits your theme */
+        border-color: #666; /* Adjust the border color as needed */
+    }
+    .dark-mode .input::placeholder {
+        color: #aaa; /* A light gray color for the placeholder text */
+    }
+    .dark-mode .switch input:focus + .slider {
+        box-shadow: 0 0 0 2px #555; /* A subtle dark gray outline */
+        outline: none;
+    }
+    .dark-mode .slider:before {
+        background-color: #fff;
+    }
+    .planner {
+        display: flex;
+        flex-direction: column;
+        width: 95%;
+        max-width: 800px;
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+    .header-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    .header {
+        background-color: #0E4B91;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        font-weight: bold;
+        border-radius: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .save-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        z-index: 1000;
+    }
+    .button-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    .button-29 {
+        align-items: center;
+        appearance: none;
+        background-image: radial-gradient(100% 100% at 100% 0, #4CC1BA 0, #0E4B91 100%);
+        border: 0;
+        border-radius: 6px;
+        box-shadow: rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, rgba(58, 65, 111, .5) 0 -3px 0 inset;
+        box-sizing: border-box;
+        color: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        font-family: "JetBrains Mono", monospace;
+        height: 48px;
+        justify-content: center;
+        line-height: 1;
+        list-style: none;
+        overflow: hidden;
+        padding: 0 16px;
+        position: relative;
+        text-align: left;
+        text-decoration: none;
+        transition: box-shadow .15s, transform .15s;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        white-space: nowrap;
+        will-change: box-shadow, transform;
+        font-size: 14px;
+    }
+    .button-29:focus {
+        box-shadow: #3c4fe0 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+    }
+    .button-29:hover {
+        box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+        transform: translateY(-2px);
+    }
+    .button-29:active {
+        box-shadow: #3c4fe0 0 3px 7px inset;
+        transform: translateY(2px);
+    }
+    .save-button {
+        background-image: radial-gradient(100% 100% at 100% 0, #4CC1BA 0, #0E4B91 100%);
+    }
+    .clear-button {
+        background-image: radial-gradient(100% 100% at 100% 0, #FFDE62 0, #F6891F 100%);
+    }
+    .export-button {
+        background-image: radial-gradient(100% 100% at 100% 0, #28a745 0, #218838 100%);
+    }
+    .time-slots {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow-y: auto;
+        max-height: 70vh;
+        padding: 10px;
+    }
+    .time-slot {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+    }
+    .time-slot:nth-child(odd) .time {
+        background-color: #4CC1BA;
+    }
+    .time-slot:nth-child(even) .time {
+        background-color: #0E4B91;
+    }
+    .time-slot:last-child {
+        border-bottom: none;
+    }
+    .switch {
+        position: relative;
+        display: inline-block;
+        float:left;
+        width: 50px;
+        height: 20px;
+    }
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .dark-mode input[type="checkbox"]:checked {
+        box-shadow: none;
+        outline: none;
+    }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 15px;
+        width: 15px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+    input:focus + .slider {
+        box-shadow: none;
+    }
+    input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+    .slider.round {
+        border-radius: 20px;
+    }
+    .slider.round:before {
+        border-radius: 50%;
+    }
+    .dark-mode .slider.round {
+        background-color: #333; /* Or whatever color you're using for dark mode */
+        border-radius: 20px; /* Match the value from step 1 */
+    }
+    .time {
+        color: white;
+        width: auto;
+        text-align: center;
+        padding: 10px;
+        border-radius: 5px;
+        margin-right: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 5px;
+    }
+    .time.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+    .input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        outline: none;
+        transition: background-color 0.3s ease;
+    }
+    .input:focus {
+        background-color: #f0f8ff;
+    }
+    #datePicker {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        width: 21%;
+        box-sizing: border-box;
+    }
+    @media (max-width: 600px) {
+        .planner {
+            padding: 10px;
+        }
+        .header {
+            font-size: 16px;
+            padding: 10px;
+        }
+        .button-29 {
+            font-size: 14px;
+            height: 40px;
+            padding: 0 12px;
+        }
+        .time {
+            width: 60px;
+            padding: 5px;
+            font-size: 12px;
+        }
+        .input {
+            padding: 5px;
+            font-size: 14px;
+        }
+        .time-slots {
+            max-height: 60vh;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="planner">
+        <div class="header-container">
+            <div class="header">
+                <label class="switch">
+                    <input type="checkbox" id="toggle-dark-mode">
+                    <span class="slider round"></span>
+                </label>
+                HOURLY PLANNER
+            </div>
+            <div class="button-container">
+                <input type="date" id="datePicker" class="datepicker">   
+                <button class="button-29 save-button" onclick="saveData()">Save</button>
+                <button class="button-29 clear-button" id="clearButton" onclick="clearFields()">Clear Fields</button>
+                <button class="button-29 export-button" onclick="exportToCSV()">Export to CSV</button>
+                <button class="button-29 import-button" onclick="importFromCSV()">Import from CSV</button>
+            </div>
+            <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleFileSelect(event)">
+            <div class="save-message" id="saveMessage">Data has been saved</div>
+        </div>
+        <div class="time-slots">
+            <div class="time-slot"><div class="time disabled">8:00 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">8:15 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">8:30 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">8:45 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">9:00 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">9:15 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">9:30 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">9:45 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">10:00 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">10:15 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">10:30 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">10:45 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">11:00 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">11:15 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">11:30 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">11:45 AM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">12:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">12:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">12:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">12:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">1:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">1:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">1:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">1:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">2:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">2:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">2:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">2:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">3:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">3:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">3:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">3:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">4:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">4:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">4:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">4:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">5:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">5:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">5:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">5:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">6:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">6:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">6:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">6:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">7:00 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">7:15 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">7:30 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+            <div class="time-slot"><div class="time disabled">7:45 PM</div><input type="text" class="input" oninput="updateMailLink(this)"><button class="voice-input-button" onclick="startVoiceInput(this)">🎤</button></div>
+        </div>
+    </div>
+    <script>
+        let lastData = null; // To store the last data before clearing
+        let undoTimeout; // To store the timeout for undo
+        let recognition;
+        let isRecording = false; // Track the recording state
+        let microphoneAccessGranted = false;
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowDown') {
+                let activeElement = document.activeElement;
+                if (activeElement.classList.contains('input')) {
+                    let nextElement = activeElement.parentElement.nextElementSibling;
+                    if (nextElement && nextElement.querySelector('.input')) {
+                        nextElement.querySelector('.input').focus();
+                    }
+                }
+            } else if (event.key === 'ArrowUp') {
+                let activeElement = document.activeElement;
+                if (activeElement.classList.contains('input')) {
+                    let prevElement = activeElement.parentElement.previousElementSibling;
+                    if (prevElement && prevElement.querySelector('.input')) {
+                        prevElement.querySelector('.input').focus();
+                    }
+                }
+            } else if (event.key === 'Enter') {
+                document.querySelector('.save-button').click();
+            }
+        });
+
+        function saveData() {
+            const date = document.getElementById('datePicker').value;
+            const inputs = document.querySelectorAll('.input');
+            const data = {};
+            inputs.forEach((input, index) => {
+                data[index] = input.value;
+            });
+            let allData = JSON.parse(localStorage.getItem('plannerData')) || {};
+            allData[date] = data;
+            localStorage.setItem('plannerData', JSON.stringify(allData));
+            showSaveMessage();
+        }
+
+        function clearFields() {
+            const inputs = document.querySelectorAll('.input');
+            lastData = Array.from(inputs).map(input => input.value); // Store current data for undo
+            inputs.forEach(input => {
+                input.value = '';
+                input.disabled = true; // Disable input fields
+                updateMailLink(input);
+            });
+
+            // Change button to "Undo"
+            const clearButton = document.getElementById('clearButton');
+            clearButton.textContent = 'Undo';
+            clearButton.style.backgroundColor = 'red'; // Change color to red
+            clearButton.onclick = undoClear; // Change onclick to undoClear function
+
+            // Set timeout for undo
+            undoTimeout = setTimeout(() => {
+                finalizeClearing();
+            }, 4000); // 4 seconds
+        }
+
+        function undoClear() {
+            clearTimeout(undoTimeout); // Clear the timeout
+            const inputs = document.querySelectorAll('.input');
+            inputs.forEach((input, index) => {
+                input.value = lastData[index] || '';
+                input.disabled = false; // Enable input fields
+                updateMailLink(input);
+            });
+            resetClearButton();
+        }
+
+        function finalizeClearing() {
+            const inputs = document.querySelectorAll('.input');
+            inputs.forEach(input => {
+                input.disabled = false; // Re-enable input fields
+            });
+            const date = document.getElementById('datePicker').value;
+            let allData = JSON.parse(localStorage.getItem('plannerData')) || {};
+            delete allData[date];
+            localStorage.setItem('plannerData', JSON.stringify(allData));
+            lastData = null; // Clear last data
+            resetClearButton();
+        }
+
+        function resetClearButton() {
+            const clearButton = document.getElementById('clearButton');
+            clearButton.textContent = 'Clear Fields';
+            clearButton.style.backgroundColor = ''; // Reset color
+            clearButton.onclick = clearFields; // Reset onclick to clearFields function
+        }
+
+        function loadData() {
+            const date = document.getElementById('datePicker').value;
+            const allData = JSON.parse(localStorage.getItem('plannerData'));
+            const inputs = document.querySelectorAll('.input');
+            if (allData && allData[date]) {
+                inputs.forEach((input, index) => {
+                    input.value = allData[date][index] || '';
+                    updateMailLink(input);
+                });
+            } else {
+                inputs.forEach(input => {
+                    input.value = '';
+                    updateMailLink(input);
+                });
+            }
+        }
+
+        function showSaveMessage() {
+            const saveMessage = document.getElementById('saveMessage');
+            saveMessage.style.display = 'block';
+            saveMessage.style.opacity = '1';
+            setTimeout(() => {
+                saveMessage.style.opacity = '0';
+                setTimeout(() => {
+                    saveMessage.style.display = 'none';
+                }, 500);
+            }, 2000);
+        }
+
+        function updateMailLink(input) {
+            const timeSlot = input.parentElement.querySelector('.time');
+            const time = timeSlot.textContent.split(' ')[0] + ' ' + timeSlot.textContent.split(' ')[1]; // Get time without the mail symbol
+            const task = input.value.trim();
+
+            if (task) {
+                timeSlot.classList.remove('disabled');
+                timeSlot.innerHTML = `<a href="mailto:?subject=${encodeURIComponent(task + ' - ' + time)}" style="color: white; text-decoration: none;">${time} (✉)</a>`;
+            } else {
+                timeSlot.classList.add('disabled');
+                timeSlot.textContent = time; // Reset to original time text without mail symbol
+            }
+        }
+
+        function exportToCSV() {
+            const date = document.getElementById('datePicker').value;
+            const rows = [['Date', 'Time', 'Task']];
+            const timeSlots = document.querySelectorAll('.time-slot');
+            timeSlots.forEach(slot => {
+                const time = slot.querySelector('.time').textContent.split(' (')[0]; // Get time without mail symbol
+                const input = slot.querySelector('.input').value;
+                if (input.trim() !== '') {
+                    rows.push([date, time, input]);
+                }
+            });
+            let csvContent = "data:text/csv;charset=utf-8," 
+                + rows.map(e => e.join(",")).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `hourly_planner_${date}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importFromCSV() {
+            document.getElementById('csvFileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const contents = e.target.result;
+                processCSV(contents);
+            };
+            reader.readAsText(file);
+        }
+
+        function processCSV(contents) {
+            const lines = contents.split('\n');
+            const data = {};
+            let successCount = 0;
+            
+            for (let i = 1; i < lines.length; i++) {  // Start from 1 to skip header
+                const parts = lines[i].split(',');
+                if (parts.length >= 2) {
+                    const time = parts[0].trim();
+                    const task = parts.slice(1).join(',').trim();  // Join remaining parts in case task contains commas
+                    const timeIndex = getTimeIndex(time);
+                    if (timeIndex !== -1) {
+                        data[timeIndex] = task;
+                        successCount++;
+                    } else {
+                        console.warn(`Time slot not found for: ${time}`);
+                    }
+                }
+            }
+
+            if (successCount === 0) {
+                alert("No valid entries were found in the imported file. Please check the file format.");
+                return;
+            }
+
+            const inputs = document.querySelectorAll('.input');
+            inputs.forEach((input, index) => {
+                input.value = data[index] || '';
+                updateMailLink(input);
+            });
+
+            saveData();  // Save the imported data
+            loadData();
+            alert(`Import completed. ${successCount} entries were successfully imported.`);
+        }
+
+        function getTimeIndex(time) {
+            const timeSlots = document.querySelectorAll('.time');
+            for (let i = 0; i < timeSlots.length; i++) {
+                if (timeSlots[i].textContent.trim() === time) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        // Set initial date to today
+        document.getElementById('datePicker').valueAsDate = new Date();
+
+        // Add event listener for date changes
+        document.getElementById('datePicker').addEventListener('change', loadData);
+
+        // Request microphone access once when the page loads
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function(stream) {
+                console.log("Microphone access granted.");
+                microphoneAccessGranted = true;
+            })
+            .catch(function(err) {
+                console.error("Microphone access denied:", err);
+                microphoneAccessGranted = false;
+            });
+
+        // Check for browser support and request microphone access once
+        if ('webkitSpeechRecognition' in window) {
+            const SpeechRecognition = window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition(); // Initialize the recognition instance
+
+            recognition.continuous = false; // Stop automatically after recognizing
+            recognition.interimResults = false; // Do not return interim results
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript; // Get the recognized text
+                const inputField = recognition.inputField; // Reference to the input field
+                inputField.value = transcript; // Set the input field value to the recognized text
+                updateMailLink(inputField); // Update the mail link if necessary
+                stopVoiceInput(recognition.button); // Stop recording after getting the result
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                stopVoiceInput(recognition.button); // Stop recording on error
+            };
+        }
+
+        // Function to start voice input
+        function startVoiceInput(button) {
+            if (!microphoneAccessGranted) {
+                alert("Please grant microphone access to use voice input.");
+                return;
+            }
+
+            if (!isRecording) {
+                recognition.inputField = button.previousElementSibling; // Get the corresponding input field
+                recognition.inputField.value = ''; // Clear the textbox before recording
+                recognition.button = button; // Store the button in the recognition object
+                recognition.start(); // Start the speech recognition
+                button.innerHTML = "⏹"; // Change button icon to stop recording
+                isRecording = true; // Update recording state
+            } else {
+                stopVoiceInput(button); // Stop recording if already recording
+            }
+        }
+
+        // Function to stop voice input
+        function stopVoiceInput(button) {
+            recognition.stop(); // Stop the speech recognition
+            button.innerHTML = "🎤"; // Reset button icon to microphone
+            isRecording = false; // Update recording state
+        }
+
+        // Add event listeners to all microphone buttons
+        document.querySelectorAll('.voice-input-button').forEach(button => {
+            button.addEventListener('click', function() {
+                startVoiceInput(this);
+            });
+        });
+
+        const toggleDarkModeInput = document.getElementById('toggle-dark-mode');
+        const body = document.body;
+        const planner = document.querySelector('.planner');
+
+        toggleDarkModeInput.addEventListener('change', () => {
+            body.classList.toggle('dark-mode');
+            planner.classList.toggle('dark-mode');
+            document.querySelector('.header').classList.toggle('dark-mode');
+            document.querySelectorAll('.button-29').forEach(button => {
+                button.classList.toggle('dark-mode');
+            });
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.toggle('dark-mode');
+            });
+            document.querySelectorAll('.input').forEach(input => {
+                input.classList.toggle('dark-mode');
+            });
+            document.getElementById('saveMessage').classList.toggle('dark-mode');
+        });
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
